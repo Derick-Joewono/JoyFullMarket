@@ -41,7 +41,6 @@ public class CustomerRepository {
 
             while (rs.next()) {
                 Customer c = new Customer(
-                		rs.getInt("id"), 
                 		rs.getString("Full_name"),
                 		rs.getString("email"),
                 		rs.getString("password"),
@@ -68,14 +67,15 @@ public class CustomerRepository {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                Customer c = new Customer(
-                		rs.getInt("id"), 
+                Customer c = new Customer( 
                 		rs.getString("Full_name"),
                 		rs.getString("email"),
                 		rs.getString("password"),
                 		rs.getString("phone"),
                 		rs.getString("address"),
-                		rs.getString("gender"));
+                		rs.getString("gender"));            
+                c.setId(rs.getInt("id"));
+                
                 return c;
             }
 
@@ -120,4 +120,29 @@ public class CustomerRepository {
 
         return false;
     }
+    
+    public boolean isEmailExist(String email) {
+        String sql = "SELECT 1 FROM customers WHERE email = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next(); 
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    
+    public boolean isMatchPassAndEmail(String email, String password) {
+		String sql = "SELECT * FROM customer WHERE email = ? AND password = ?";
+
+    	
+    	
+    	return false;
+    }
+
 }
