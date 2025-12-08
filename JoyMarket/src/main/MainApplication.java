@@ -2,7 +2,7 @@ package main;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import view.RegisterPage;
+import view.LoginPage;
 
 public class MainApplication extends Application {
 
@@ -12,7 +12,7 @@ public class MainApplication extends Application {
 
     @Override
     public void start(Stage stage) {
-        RegisterPage registerPage = new RegisterPage();
-        registerPage.show(stage);
+        LoginPage loginPage = new LoginPage();
+        loginPage.show(stage);
     }
 }

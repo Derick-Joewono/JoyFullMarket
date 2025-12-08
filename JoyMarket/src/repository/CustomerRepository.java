@@ -42,7 +42,7 @@ public class CustomerRepository {
             while (rs.next()) {
                 Customer c = new Customer(
                 		rs.getInt("id"), 
-                		rs.getString("Full_name"),
+                		rs.getString("full_name"),
                 		rs.getString("email"),
                 		rs.getString("password"),
                 		rs.getString("phone"),
@@ -70,7 +70,7 @@ public class CustomerRepository {
             if (rs.next()) {
                 Customer c = new Customer(
                 		rs.getInt("id"), 
-                		rs.getString("Full_name"),
+                		rs.getString("full_name"),
                 		rs.getString("email"),
                 		rs.getString("password"),
                 		rs.getString("phone"),
@@ -119,5 +119,47 @@ public class CustomerRepository {
         }
 
         return false;
+    }
+    
+    public boolean emailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM customers WHERE email = ?";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+    
+    public Customer getCustomerByEmail(String email) {
+        String sql = "SELECT * FROM customers WHERE email = ?";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                Customer c = new Customer(
+                    rs.getInt("id"), 
+                    rs.getString("full_name"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    rs.getString("phone"),
+                    rs.getString("address"),
+                    rs.getString("gender"));
+                return c;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return null;
     }
 }

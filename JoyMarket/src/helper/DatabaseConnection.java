@@ -7,7 +7,7 @@ public class DatabaseConnection {
 
 	public static DatabaseConnection instance;
 	private Connection connection;
-	private static final String URL = "jdbc:mysql://localhost:3306/joymarket?useSSL=false&serverTimezone=UTC";
+	private static final String URL = "jdbc:mysql://localhost:3306/joymarket";
 	private static final String USER = "root";
 	private static final String PASSWORD ="";
 	
