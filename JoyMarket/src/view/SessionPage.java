@@ -6,7 +6,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -19,115 +18,77 @@ public class SessionPage {
 
     Scene scene;
     BorderPane borderPane;
-    VBox mainContainer;
-    VBox infoContainer;
-    HBox headerBox;
-    HBox buttonBox;
+    VBox card;
+    VBox infoBox;
+    HBox actionBox;
 
-    Label welcomeLabel;
-    Label nameLabel;
-    Label emailLabel;
-    Label phoneLabel;
-    Label addressLabel;
-    Label genderLabel;
     Label titleLabel;
+    Label subtitleLabel;
 
     Button logoutBtn;
     Button viewProfileBtn;
     Button shopBtn;
 
     CustomerController customerController;
+    Customer currentCustomer;
+
+    private static final String ACCENT_COLOR = "#64748B";
 
     private void initiate() {
         borderPane = new BorderPane();
-        mainContainer = new VBox(20);
-        infoContainer = new VBox(15);
-        headerBox = new HBox();
-        buttonBox = new HBox(15);
+        borderPane.setPadding(new Insets(24));
+        borderPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #EEF2F6, #F8FAFC);");
 
-        mainContainer.setPadding(new Insets(30));
-        mainContainer.setAlignment(Pos.CENTER);
-        infoContainer.setPadding(new Insets(20));
-        infoContainer.setAlignment(Pos.CENTER_LEFT);
-        headerBox.setAlignment(Pos.CENTER_RIGHT);
-        headerBox.setPadding(new Insets(10));
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setSpacing(15);
+        card = new VBox(18);
+        card.setPadding(new Insets(28));
+        card.setAlignment(Pos.TOP_LEFT);
+        card.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, rgba(100,116,139,0.25), 24, 0.12, 0, 8);");
+
+        infoBox = new VBox(10);
+        actionBox = new HBox(12);
+        actionBox.setAlignment(Pos.CENTER_LEFT);
 
         customerController = new CustomerController();
+        currentCustomer = SessionManager.getInstance().getCurrentCustomer();
 
-        Customer currentCustomer = SessionManager.getInstance().getCurrentCustomer();
-        
-        if (currentCustomer == null) {
-            // If no session, redirect to login
-            return;
-        }
-
-        titleLabel = new Label("JoyMarket Dashboard");
-        titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
-
-        welcomeLabel = new Label("Welcome, " + currentCustomer.getFull_name() + "!");
-        welcomeLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        nameLabel = new Label("Name: " + currentCustomer.getFull_name());
-        nameLabel.setStyle("-fx-font-size: 14px;");
-        
-        emailLabel = new Label("Email: " + currentCustomer.getEmail());
-        emailLabel.setStyle("-fx-font-size: 14px;");
-        
-        phoneLabel = new Label("Phone: " + currentCustomer.getPhone());
-        phoneLabel.setStyle("-fx-font-size: 14px;");
-        
-        addressLabel = new Label("Address: " + currentCustomer.getAddress());
-        addressLabel.setStyle("-fx-font-size: 14px;");
-        
-        genderLabel = new Label("Gender: " + currentCustomer.getGender());
-        genderLabel.setStyle("-fx-font-size: 14px;");
-
-        logoutBtn = new Button("Logout");
-        logoutBtn.setPrefWidth(120);
-        logoutBtn.setStyle("-fx-font-size: 14px; -fx-background-color: #dc3545; -fx-text-fill: white;");
-        
-        viewProfileBtn = new Button("View Profile");
-        viewProfileBtn.setPrefWidth(120);
-        viewProfileBtn.setStyle("-fx-font-size: 14px;");
-        
-        shopBtn = new Button("Shop Now");
-        shopBtn.setPrefWidth(120);
-        shopBtn.setStyle("-fx-font-size: 14px; -fx-background-color: #28a745; -fx-text-fill: white;");
-
-        scene = new Scene(borderPane, 700, 500);
+        scene = new Scene(borderPane, 900, 640);
     }
 
     private void setLayout() {
-        Customer currentCustomer = SessionManager.getInstance().getCurrentCustomer();
-        
         if (currentCustomer == null) {
             return;
         }
 
-        infoContainer.getChildren().addAll(
-            welcomeLabel,
-            new Separator(),
-            nameLabel,
-            emailLabel,
-            phoneLabel,
-            addressLabel,
-            genderLabel
+        infoBox.getChildren().clear();
+        actionBox.getChildren().clear();
+
+        titleLabel = new Label("JoyMarket Dashboard");
+        titleLabel.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #0F172A;");
+
+        subtitleLabel = new Label("Secure session active. Your profile and quick actions are below.");
+        subtitleLabel.setStyle("-fx-text-fill: #475569;");
+
+        infoBox.getChildren().addAll(
+            infoRow("Name", currentCustomer.getFull_name()),
+            infoRow("Email", currentCustomer.getEmail()),
+            infoRow("Phone", currentCustomer.getPhone()),
+            infoRow("Address", currentCustomer.getAddress()),
+            infoRow("Gender", currentCustomer.getGender())
         );
 
-        buttonBox.getChildren().addAll(shopBtn, viewProfileBtn, logoutBtn);
-        headerBox.getChildren().add(logoutBtn);
+        shopBtn = createAccentButton("Shop now", ACCENT_COLOR);
+        viewProfileBtn = createAccentButton("View profile", "#334155");
+        logoutBtn = createAccentButton("Logout", "#E11D48");
 
-        mainContainer.getChildren().addAll(
-            titleLabel,
-            infoContainer,
-            new Separator(),
-            buttonBox
-        );
+        shopBtn.setPrefWidth(130);
+        viewProfileBtn.setPrefWidth(130);
+        logoutBtn.setPrefWidth(110);
 
-        borderPane.setTop(headerBox);
-        borderPane.setCenter(mainContainer);
+        actionBox.getChildren().addAll(shopBtn, viewProfileBtn, logoutBtn);
+
+        card.getChildren().setAll(titleLabel, subtitleLabel, infoBox, actionBox);
+
+        borderPane.setCenter(card);
     }
 
     private void setEventHandler(Stage stage) {
@@ -141,8 +102,8 @@ public class SessionPage {
         });
 
         viewProfileBtn.setOnAction(e -> {
-            showAlert(Alert.AlertType.INFORMATION, "Profile", 
-                "Profile feature coming soon!");
+            ProfilePage profilePage = new ProfilePage();
+            profilePage.show(stage);
         });
 
         shopBtn.setOnAction(e -> {
@@ -157,6 +118,27 @@ public class SessionPage {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private HBox infoRow(String labelText, String valueText) {
+        HBox row = new HBox(8);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        Label label = new Label(labelText + ":");
+        label.setStyle("-fx-font-weight: bold; -fx-text-fill: #0F172A;");
+
+        Label value = new Label(valueText);
+        value.setStyle("-fx-text-fill: #475569;");
+
+        row.getChildren().addAll(label, value);
+        return row;
+    }
+
+    private Button createAccentButton(String text, String backgroundColor) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: " + backgroundColor + "; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 13px; -fx-font-weight: bold;");
+        button.setPrefHeight(40);
+        return button;
     }
 
     public void show(Stage stage) {

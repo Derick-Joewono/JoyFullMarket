@@ -51,4 +51,36 @@ public class CustomerController {
 		SessionManager.getInstance().logout();
 	}
 	
+	public boolean updateProfile(String fullName, String email, String newPassword, String phone, String address, String gender) {
+		Customer current = SessionManager.getInstance().getCurrentCustomer();
+		if (current == null) {
+			return false;
+		}
+		
+		String passwordToPersist = current.getPassword();
+		if (newPassword != null && !newPassword.isBlank()) {
+			String hashed = PasswordHasher.hashPassword(newPassword);
+			if (hashed == null) {
+				return false;
+			}
+			passwordToPersist = hashed;
+		}
+		
+		Customer updated = new Customer(
+			current.getId(),
+			fullName,
+			email,
+			passwordToPersist,
+			phone,
+			address,
+			gender
+		);
+		
+		boolean success = repo.updateCustomer(updated);
+		if (success) {
+			SessionManager.getInstance().setCurrentCustomer(updated);
+		}
+		return success;
+	}
+	
 }

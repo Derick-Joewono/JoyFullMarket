@@ -21,7 +21,7 @@ public class LoginPage {
     Scene scene;
     BorderPane borderPane;
     GridPane formPane;
-    VBox mainContainer;
+    VBox card;
 
     TextField emailField;
     PasswordField passwordField;
@@ -37,37 +37,46 @@ public class LoginPage {
 
     private void initiate() {
         borderPane = new BorderPane();
-        mainContainer = new VBox(20);
-        formPane = new GridPane();
+        borderPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #EEF2F6, #F8FAFC);");
+        borderPane.setPadding(new Insets(24));
 
-        formPane.setVgap(15);
-        formPane.setHgap(15);
-        formPane.setPadding(new Insets(20));
-        mainContainer.setPadding(new Insets(40));
-        mainContainer.setAlignment(Pos.CENTER);
+        card = new VBox(18);
+        card.setPadding(new Insets(32));
+        card.setAlignment(Pos.CENTER);
+        card.setMaxWidth(420);
+        card.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, rgba(100,116,139,0.25), 24, 0.12, 0, 8);");
+
+        formPane = new GridPane();
+        formPane.setVgap(12);
+        formPane.setHgap(12);
+        formPane.setAlignment(Pos.CENTER);
 
         emailField = new TextField();
         emailField.setPromptText("Enter your email");
+        emailField.setStyle("-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #CBD5E1; -fx-padding: 10;");
         passwordField = new PasswordField();
         passwordField.setPromptText("Enter your password");
+        passwordField.setStyle("-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #CBD5E1; -fx-padding: 10;");
 
         titleLabel = new Label("JoyMarket Login");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        titleLabel.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #0F172A;");
         
         emailLabel = new Label("Email:");
+        emailLabel.setStyle("-fx-text-fill: #475569;");
         passwordLabel = new Label("Password:");
+        passwordLabel.setStyle("-fx-text-fill: #475569;");
 
         loginBtn = new Button("Login");
         loginBtn.setPrefWidth(150);
-        loginBtn.setStyle("-fx-font-size: 14px;");
+        loginBtn.setStyle(primaryButtonStyle());
         
         registerBtn = new Button("Register");
         registerBtn.setPrefWidth(150);
-        registerBtn.setStyle("-fx-font-size: 14px;");
+        registerBtn.setStyle(ghostButtonStyle());
 
         customerController = new CustomerController();
 
-        scene = new Scene(borderPane, 500, 400);
+        scene = new Scene(borderPane, 680, 520);
     }
 
     private void setLayout() {
@@ -84,8 +93,9 @@ public class LoginPage {
         formPane.add(buttonBox, 0, 2, 2, 1);
         GridPane.setHalignment(buttonBox, javafx.geometry.HPos.CENTER);
 
-        mainContainer.getChildren().addAll(titleLabel, formPane);
-        borderPane.setCenter(mainContainer);
+        card.getChildren().addAll(titleLabel, formPane);
+        borderPane.setCenter(card);
+        BorderPane.setAlignment(card, Pos.CENTER);
     }
 
     private void setEventHandler(Stage stage) {
@@ -138,6 +148,14 @@ public class LoginPage {
         stage.setScene(scene);
         stage.setTitle("JoyMarket - Login");
         stage.show();
+    }
+
+    private String primaryButtonStyle() {
+        return "-fx-background-color: #64748B; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;";
+    }
+
+    private String ghostButtonStyle() {
+        return "-fx-background-color: transparent; -fx-border-color: #64748B; -fx-text-fill: #64748B; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 10; -fx-background-radius: 10;";
     }
 }
 
