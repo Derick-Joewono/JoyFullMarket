@@ -3,7 +3,7 @@ package controller;
 import model.Customer;
 import repository.CustomerRepository;
 
-public class CustomerController {
+public class RegisterController {
 
 	CustomerRepository repo= new CustomerRepository();
 	
