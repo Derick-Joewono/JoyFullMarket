@@ -10,9 +10,8 @@ public class Customer {
 	private String address;
 	private String gender;
 	
-	public Customer(int id, String full_name, String email, String password, String phone, String address, String gender) {
+	public Customer(String full_name, String email, String password, String phone, String address, String gender) {
 		super();
-		this.id = id;
 		this.full_name = full_name;
 		this.email = email;
 		this.password = password;
