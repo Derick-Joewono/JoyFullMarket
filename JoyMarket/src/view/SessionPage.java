@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import controller.CustomerController;
 import helper.SessionManager;
 import model.Customer;
+import repository.CustomerBalanceRepository;
 
 public class SessionPage {
 
@@ -28,9 +29,13 @@ public class SessionPage {
     Button logoutBtn;
     Button viewProfileBtn;
     Button shopBtn;
+    Button topUpBtn;
 
+    
     CustomerController customerController;
     Customer currentCustomer;
+    CustomerBalanceRepository balanceRepo;
+    double currentBalance;
 
     private static final String ACCENT_COLOR = "#64748B";
 
@@ -52,6 +57,17 @@ public class SessionPage {
         currentCustomer = SessionManager.getInstance().getCurrentCustomer();
 
         scene = new Scene(borderPane, 900, 640);
+        
+        customerController = new CustomerController();
+        currentCustomer = SessionManager.getInstance().getCurrentCustomer();
+        balanceRepo = new CustomerBalanceRepository();
+
+        // Ambil saldo user dari database
+        balanceRepo = new CustomerBalanceRepository();
+        currentBalance = balanceRepo.getBalance(currentCustomer.getId());
+
+
+
     }
 
     private void setLayout() {
@@ -73,18 +89,21 @@ public class SessionPage {
             infoRow("Email", currentCustomer.getEmail()),
             infoRow("Phone", currentCustomer.getPhone()),
             infoRow("Address", currentCustomer.getAddress()),
-            infoRow("Gender", currentCustomer.getGender())
+            infoRow("Gender", currentCustomer.getGender()),
+            infoRow("Balance", "Rp " + currentBalance)
         );
 
         shopBtn = createAccentButton("Shop now", ACCENT_COLOR);
         viewProfileBtn = createAccentButton("View profile", "#334155");
         logoutBtn = createAccentButton("Logout", "#E11D48");
+        topUpBtn = createAccentButton("Top Up Balance", "#16A34A");
 
         shopBtn.setPrefWidth(130);
         viewProfileBtn.setPrefWidth(130);
         logoutBtn.setPrefWidth(110);
+        topUpBtn.setPrefWidth(130);
 
-        actionBox.getChildren().addAll(shopBtn, viewProfileBtn, logoutBtn);
+        actionBox.getChildren().addAll(shopBtn, viewProfileBtn, logoutBtn, topUpBtn);
 
         card.getChildren().setAll(titleLabel, subtitleLabel, infoBox, actionBox);
 
@@ -110,6 +129,12 @@ public class SessionPage {
             showAlert(Alert.AlertType.INFORMATION, "Shop", 
                 "Shopping feature coming soon!");
         });
+        
+        topUpBtn.setOnAction(e -> {
+            TopUpPage topUpPage = new TopUpPage();
+            topUpPage.show(stage);
+        });
+
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
