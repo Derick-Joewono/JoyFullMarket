@@ -56,7 +56,11 @@ CREATE TABLE `cart` (
 CREATE TABLE `couriers` (
   `courier_id` int(11) NOT NULL,
   `courier_name` varchar(100) NOT NULL,
+  `courier_email` varchar(100) NOT NULL,
   `courier_phone` varchar(15) NOT NULL,
+  `courier_password` varchar(255) NOT NULL,
+  `vehicle_type` varchar(50) DEFAULT NULL,
+  `vehicle_plate` varchar(20) DEFAULT NULL,
   `courier_status` enum('ACTIVE','INACTIVE') DEFAULT 'ACTIVE'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

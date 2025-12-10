@@ -13,11 +13,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import controller.CustomerController;
 import controller.CourierController;
 import helper.SessionManager;
 
-public class LoginPage {
+public class CourierLoginPage {
+
+    private static final String ACCENT_COLOR = "#10B981"; // Green for courier theme
 
     Scene scene;
     BorderPane borderPane;
@@ -32,21 +33,20 @@ public class LoginPage {
     Label titleLabel;
 
     Button loginBtn;
-    Button registerBtn;
+    Button backBtn;
 
-    CustomerController customerController;
     CourierController courierController;
 
     private void initiate() {
         borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #EEF2F6, #F8FAFC);");
+        borderPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #ECFDF5, #F0FDF4);");
         borderPane.setPadding(new Insets(24));
 
         card = new VBox(18);
         card.setPadding(new Insets(32));
         card.setAlignment(Pos.CENTER);
         card.setMaxWidth(420);
-        card.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, rgba(100,116,139,0.25), 24, 0.12, 0, 8);");
+        card.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, rgba(16,185,129,0.25), 24, 0.12, 0, 8);");
 
         formPane = new GridPane();
         formPane.setVgap(12);
@@ -55,31 +55,30 @@ public class LoginPage {
 
         emailField = new TextField();
         emailField.setPromptText("Enter your email");
-        emailField.setStyle("-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #CBD5E1; -fx-padding: 10;");
+        emailField.setStyle(inputStyle());
         passwordField = new PasswordField();
         passwordField.setPromptText("Enter your password");
-        passwordField.setStyle("-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #CBD5E1; -fx-padding: 10;");
+        passwordField.setStyle(inputStyle());
 
-        titleLabel = new Label("JoyMarket Login");
-        titleLabel.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #0F172A;");
-        
+        titleLabel = new Label("Courier Login");
+        titleLabel.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #064E3B;");
+
         emailLabel = new Label("Email:");
-        emailLabel.setStyle("-fx-text-fill: #475569;");
+        emailLabel.setStyle(labelStyle());
         passwordLabel = new Label("Password:");
-        passwordLabel.setStyle("-fx-text-fill: #475569;");
+        passwordLabel.setStyle(labelStyle());
 
         loginBtn = new Button("Login");
         loginBtn.setPrefWidth(150);
         loginBtn.setStyle(primaryButtonStyle());
-        
-        registerBtn = new Button("Register");
-        registerBtn.setPrefWidth(150);
-        registerBtn.setStyle(ghostButtonStyle());
 
-        customerController = new CustomerController();
+        backBtn = new Button("Back");
+        backBtn.setPrefWidth(150);
+        backBtn.setStyle(ghostButtonStyle());
+
         courierController = new CourierController();
 
-        scene = new Scene(borderPane, 680, 580);
+        scene = new Scene(borderPane, 680, 520);
     }
 
     private void setLayout() {
@@ -91,12 +90,16 @@ public class LoginPage {
 
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(loginBtn, registerBtn);
+        buttonBox.getChildren().addAll(loginBtn, backBtn);
 
         formPane.add(buttonBox, 0, 2, 2, 1);
         GridPane.setHalignment(buttonBox, javafx.geometry.HPos.CENTER);
 
-        card.getChildren().addAll(titleLabel, formPane);
+        // Add courier icon/badge
+        Label courierBadge = new Label("🚚");
+        courierBadge.setStyle("-fx-font-size: 48px;");
+
+        card.getChildren().addAll(courierBadge, titleLabel, formPane);
         borderPane.setCenter(card);
         BorderPane.setAlignment(card, Pos.CENTER);
     }
@@ -108,37 +111,30 @@ public class LoginPage {
 
             // Validation
             if (email.isEmpty() || password.isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Validation Error", 
+                showAlert(Alert.AlertType.ERROR, "Validation Error",
                     "Please fill in all fields!");
                 return;
             }
 
             // Attempt login
-            boolean customerSuccess = customerController.login(email, password);
+            boolean success = courierController.login(email, password);
 
-            if (customerSuccess) {
-                showAlert(Alert.AlertType.INFORMATION, "Success", 
-                    "Login successful! Welcome, " + SessionManager.getInstance().getCurrentCustomerName() + "!");
-                
-                // Navigate to session page
-                SessionPage sessionPage = new SessionPage();
-                sessionPage.show(stage);
+            if (success) {
+                showAlert(Alert.AlertType.INFORMATION, "Success",
+                    "Login successful! Welcome, " + SessionManager.getInstance().getCurrentCourierName() + "!");
+
+                // Navigate to courier dashboard
+                CourierDashboardPage dashboard = new CourierDashboardPage();
+                dashboard.show(stage);
             } else {
-                // Try courier login with same form
-                boolean courierSuccess = courierController.login(email, password);
-                if (courierSuccess) {
-                    CourierDashboardPage dashboard = new CourierDashboardPage();
-                    dashboard.show(stage);
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Login Failed", 
-                        "Invalid email or password!");
-                }
+                showAlert(Alert.AlertType.ERROR, "Login Failed",
+                    "Invalid phone or password, or account is inactive!");
             }
         });
 
-        registerBtn.setOnAction(e -> {
-            RegisterPage registerPage = new RegisterPage();
-            registerPage.show(stage);
+        backBtn.setOnAction(e -> {
+            LoginPage loginPage = new LoginPage();
+            loginPage.show(stage);
         });
     }
 
@@ -156,15 +152,24 @@ public class LoginPage {
         setEventHandler(stage);
 
         stage.setScene(scene);
-        stage.setTitle("JoyMarket - Login");
+        stage.setTitle("JoyMarket - Courier Login");
         stage.show();
     }
 
     private String primaryButtonStyle() {
-        return "-fx-background-color: #64748B; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;";
+        return "-fx-background-color: " + ACCENT_COLOR + "; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;";
     }
 
     private String ghostButtonStyle() {
-        return "-fx-background-color: transparent; -fx-border-color: #64748B; -fx-text-fill: #64748B; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 10; -fx-background-radius: 10;";
+        return "-fx-background-color: transparent; -fx-border-color: " + ACCENT_COLOR + "; -fx-text-fill: " + ACCENT_COLOR + "; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 10; -fx-background-radius: 10;";
+    }
+
+    private String inputStyle() {
+        return "-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #A7F3D0; -fx-padding: 10;";
+    }
+
+    private String labelStyle() {
+        return "-fx-text-fill: #065F46;";
     }
 }
+
