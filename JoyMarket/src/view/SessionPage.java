@@ -10,10 +10,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import controller.CustomerBalanceController;
 import controller.CustomerController;
 import helper.SessionManager;
 import model.Customer;
-import repository.CustomerBalanceRepository;
 
 public class SessionPage {
 
@@ -34,7 +34,8 @@ public class SessionPage {
     
     CustomerController customerController;
     Customer currentCustomer;
-    CustomerBalanceRepository balanceRepo;
+
+    CustomerBalanceController balanceController;
     double currentBalance;
 
     private static final String ACCENT_COLOR = "#64748B";
@@ -60,11 +61,11 @@ public class SessionPage {
         
         customerController = new CustomerController();
         currentCustomer = SessionManager.getInstance().getCurrentCustomer();
-        balanceRepo = new CustomerBalanceRepository();
+        
+        balanceController = new CustomerBalanceController();
+        currentCustomer = SessionManager.getInstance().getCurrentCustomer();
 
-        // Ambil saldo user dari database
-        balanceRepo = new CustomerBalanceRepository();
-        currentBalance = balanceRepo.getBalance(currentCustomer.getId());
+        currentBalance = balanceController.getBalance(currentCustomer.getId());
 
 
 
