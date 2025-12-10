@@ -16,7 +16,6 @@ import helper.SessionManager;
 
 import model.Customer;
 
-
 public class SessionPage {
 
     Scene scene;
