@@ -1,20 +1,67 @@
 package model;
 
 public class Order {
-    private int orderId;
+    private int id;
     private int customerId;
-    private int courierId;
+    private double total;
     private String status;
+    private Integer courierId;
+    private String deliveryStatus;
 
-    public Order(int orderId, int customerId, int courierId, String status) {
-        this.orderId = orderId;
+    public Order(int id, int customerId, double total, String status, Integer courierId, String deliveryStatus) {
+        this.id = id;
         this.customerId = customerId;
+        this.total = total;
+        this.status = status;
         this.courierId = courierId;
+        this.deliveryStatus = deliveryStatus;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public int getOrderId() { return orderId; }
-    public int getCustomerId() { return customerId; }
-    public int getCourierId() { return courierId; }
-    public String getStatus() { return status; }
+    public Integer getCourierId() {
+        return courierId;
+    }
+
+    public void setCourierId(Integer courierId) {
+        this.courierId = courierId;
+    }
+
+    public String getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(String deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
 }
