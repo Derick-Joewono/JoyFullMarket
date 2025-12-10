@@ -5,46 +5,57 @@ import model.Product;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProductRepository {
+    private final Connection conn;
 
-    public ArrayList<Product> getAllProducts() {
-        ArrayList<Product> list = new ArrayList<>();
-        String query = "SELECT * FROM product";
-
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(query)) {
-
-            while (rs.next()) {
-                list.add(new Product(
-                    rs.getInt("productId"),
-                    rs.getString("name"),
-                    rs.getInt("stock"),
-                    rs.getDouble("price")
-                ));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
+    public ProductRepository() {
+        this.conn = DatabaseConnection.getInstance().getConnection();
     }
 
-    public boolean updateStock(int productId, int newStock) {
-        String query = "UPDATE product SET stock = ? WHERE productId = ?";
+    public Product getProductById(int id) {
+        String sql = "SELECT * FROM products WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Product(rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getInt("stock"));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
 
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+    public boolean isStockAvailable(int productId, int qty) {
+        String sql = "SELECT stock FROM products WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt("stock") >= qty;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
 
-            ps.setInt(1, newStock);
+    public boolean reduceStock(int productId, int qty) {
+        String sql = "UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, qty);
             ps.setInt(2, productId);
-
+            ps.setInt(3, qty);
             return ps.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public List<Product> getAllProducts() {
+        List<Product> list = new ArrayList<>();
+        String sql = "SELECT * FROM products";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new Product(rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getInt("stock")));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
     }
 }

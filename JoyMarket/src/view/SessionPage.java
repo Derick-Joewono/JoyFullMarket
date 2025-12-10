@@ -35,6 +35,7 @@ public class SessionPage {
     //fixed controller
     CustomerController customerController;
     Customer currentCustomer;
+
     CustomerBalanceController balanceController;
     double currentBalance;
 
@@ -61,6 +62,7 @@ public class SessionPage {
         
         customerController = new CustomerController();
         currentCustomer = SessionManager.getInstance().getCurrentCustomer();
+
         balanceController = new CustomerBalanceController();
         currentCustomer = SessionManager.getInstance().getCurrentCustomer();
 
@@ -126,9 +128,10 @@ public class SessionPage {
         });
 
         shopBtn.setOnAction(e -> {
-            showAlert(Alert.AlertType.INFORMATION, "Shop", 
-                "Shopping feature coming soon!");
+            ProductListPage productListPage = new ProductListPage();
+            productListPage.show(stage);
         });
+
         
         topUpBtn.setOnAction(e -> {
             TopUpPage topUpPage = new TopUpPage();

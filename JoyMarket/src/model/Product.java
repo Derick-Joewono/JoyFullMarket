@@ -1,27 +1,42 @@
 package model;
 
 public class Product {
-    private int productId;
-    private String name;
-    private int stock;
-    private double price;
 
-    public Product(int productId, String name, int stock,double price) {
-        this.productId = productId;
-        this.name = name;
-        this.stock = stock;
-        this.price=price;
+	private int id;
+	private String name;
+	private double price;
+	private int stock;
+
+	public Product(int id, String name, double price, int stock) {
+		this.id = id;
+		this.name = name;
+		this.price = price;
+		this.stock = stock;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public int getStock() {
+		return stock;
+	}
+
+	public void setStock(int s) {
+		stock = s;
+	}
+	
+    @Override
+    public String toString() {
+        return name + " - Rp " + price + " | Stock: " + stock;
     }
 
-    public int getProductId() {
-        return productId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getStock() {
-        return stock;
-    }
 }
