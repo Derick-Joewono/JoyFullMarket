@@ -6,7 +6,7 @@ import java.sql.*;
 
 public class AdminRepository {
 
-    public Admin findByEmail(String email) {
+    public Admin getAdminByEmail(String email) {
         String query = "SELECT * FROM admin WHERE email = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {

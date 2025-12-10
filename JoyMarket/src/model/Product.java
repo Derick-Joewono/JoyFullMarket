@@ -33,6 +33,9 @@ public class Product {
 	public void setStock(int s) {
 		stock = s;
 	}
+	public void setPrice(double price) {
+		this.price = price;
+	}
 	
     @Override
     public String toString() {
