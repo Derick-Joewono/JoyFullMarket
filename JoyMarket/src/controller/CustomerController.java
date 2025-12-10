@@ -4,12 +4,12 @@ import helper.PasswordHasher;
 import helper.SessionManager;
 import model.Customer;
 import repository.CustomerRepository;
-import repository.CustomerBalanceRepository; // <-- TAMBAHKAN IMPORT INI
+import repository.CustomerBalanceRepository;
 
 public class CustomerController {
 
     CustomerRepository repo = new CustomerRepository();
-    CustomerBalanceRepository balanceRepo = new CustomerBalanceRepository(); // <-- TAMBAHKAN BARIS INI
+    CustomerBalanceRepository balanceRepo = new CustomerBalanceRepository();
 
     public boolean register(String fullName, String email, String password, String phone, String address, String gender) {
         // Check if email already exists

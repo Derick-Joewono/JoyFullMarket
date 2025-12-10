@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import controller.CustomerBalanceController;
 import controller.CustomerController;
 import helper.SessionManager;
+
 import model.Customer;
 
 public class SessionPage {
@@ -31,10 +32,9 @@ public class SessionPage {
     Button shopBtn;
     Button topUpBtn;
 
-    
+    //fixed controller
     CustomerController customerController;
     Customer currentCustomer;
-
     CustomerBalanceController balanceController;
     double currentBalance;
 
@@ -61,12 +61,11 @@ public class SessionPage {
         
         customerController = new CustomerController();
         currentCustomer = SessionManager.getInstance().getCurrentCustomer();
-        
         balanceController = new CustomerBalanceController();
         currentCustomer = SessionManager.getInstance().getCurrentCustomer();
 
+        // Ambil saldo via controller, bukan repository
         currentBalance = balanceController.getBalance(currentCustomer.getId());
-
 
 
     }

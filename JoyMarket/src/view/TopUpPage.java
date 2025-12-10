@@ -9,122 +9,165 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Customer;
 
 public class TopUpPage {
 
-    private CustomerBalanceController controller = new CustomerBalanceController();
+    private static final String ACCENT_COLOR = "#64748B";
 
-    public void start(Stage stage) {
-        Customer current = SessionManager.getInstance().getCurrentCustomer();
+    Scene scene;
+    BorderPane borderPane;
+    VBox card;
+    GridPane formPane;
 
-        Label title = new Label("Top Up Balance");
-        Label currentBalanceLbl = new Label("Current Balance: Rp " + controller.getBalance(current.getId()));
+    Label balanceLabel;
+    TextField amountField;
 
-        Label amountLbl = new Label("Enter Amount:");
-        TextField amountField = new TextField();
-        Button topUpBtn = new Button("TOP UP");
-        Button backBtn = new Button("BACK");
+    Button topUpBtn;
+    Button backBtn;
 
-        Label status = new Label("");
-
-        topUpBtn.setOnAction(e -> {
-            try {
-                double amount = Double.parseDouble(amountField.getText());
-                if (amount <= 0) {
-                    status.setText("Amount must be positive!");
-                } else {
-                    boolean success = controller.topUp(current.getId(), amount);
-                    if (success) {
-                        status.setText("Top Up Success!");
-                        currentBalanceLbl.setText("Current Balance: Rp " + controller.getBalance(current.getId()));
-                        amountField.clear();
-                    }
-                }
-            } catch (Exception ex) {
-                status.setText("Invalid input!");
-            }
-        });
-
-        VBox root = new VBox(10, title, currentBalanceLbl, amountLbl, amountField, topUpBtn, backBtn, status);
-        root.setPadding(new Insets(20));
-        root.setAlignment(Pos.CENTER);
-
-        stage.setTitle("Top Up");
-        stage.setScene(new Scene(root, 350, 300));
-        stage.show();
-    }
+    CustomerBalanceController balanceController;
+    Customer currentCustomer;
 
     public void show(Stage stage) {
-        // Ambil customer login saat ini
-        Customer current = SessionManager.getInstance().getCurrentCustomer();
-        if (current == null) {
+        currentCustomer = SessionManager.getInstance().getCurrentCustomer();
+        if (currentCustomer == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Anda belum login!");
             alert.show();
             return;
         }
 
-        // Controller
-        CustomerBalanceController balanceController = new CustomerBalanceController();
+        initiate();
+        setLayout();
+        setEventHandler(stage);
 
-        // Label untuk menampilkan balance saat ini
-        Label balanceLabel = new Label("Current Balance: Rp " + balanceController.getBalance(current.getId()));
-
-        // Input amount top-up
-        TextField amountField = new TextField();
-        amountField.setPromptText("Enter amount (Rp)");
-
-        // Tombol Top Up
-        Button btnTopUp = new Button("Top Up");
-        
-        Button btnBack = new Button("Back");
-        
-        btnTopUp.setOnAction(e -> {
-            try {
-                double amount = Double.parseDouble(amountField.getText());
-                if (amount <= 0) {
-                    Alert alert = new Alert(Alert.AlertType.WARNING, "Amount must be greater than 0!");
-                    alert.show();
-                    return;
-                }
-
-                boolean success = balanceController.topUp(current.getId(), amount);
-
-                if (success) {
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION, "Top Up Successful!");
-                    successAlert.show();
-                    balanceLabel.setText("Current Balance: Rp " + balanceController.getBalance(current.getId()));
-                    amountField.clear();
-                } else {
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Top Up Failed!");
-                    errorAlert.show();
-                }
-            } catch (NumberFormatException ex) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid number format!");
-                alert.show();
-            }
-            
-        });
-        
-        btnBack.setOnAction(e -> {
-            SessionPage sessionPage = new SessionPage();
-            sessionPage.show(stage);
-        });
-       
-        
-        // Layout
-        VBox layout = new VBox(10);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
-        layout.getChildren().addAll(balanceLabel, amountField, btnTopUp, btnBack);
-
-        // Scene
-        Scene scene = new Scene(layout, 350, 200);
-        stage.setTitle("Top Up Balance");
         stage.setScene(scene);
+        stage.setTitle("JoyMarket - Top Up Balance");
         stage.show();
     }
 
+    private void initiate() {
+        borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #EEF2F6, #F8FAFC);");
+        borderPane.setPadding(new Insets(24));
+
+        card = new VBox(18);
+        card.setPadding(new Insets(32));
+        card.setAlignment(Pos.CENTER);
+        card.setMaxWidth(480);
+        card.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, rgba(100,116,139,0.25), 24, 0.12, 0, 8);");
+
+        formPane = new GridPane();
+        formPane.setVgap(12);
+        formPane.setHgap(12);
+        formPane.setAlignment(Pos.CENTER);
+
+        balanceController = new CustomerBalanceController();
+
+        balanceLabel = new Label("Current Balance: Rp " + String.format("%,.0f", balanceController.getBalance(currentCustomer.getId())));
+        balanceLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0F172A; -fx-padding: 10 20; -fx-background-color: #F1F5F9; -fx-background-radius: 10;");
+
+        amountField = new TextField();
+        amountField.setPromptText("Enter amount (Rp)");
+        amountField.setStyle(inputStyle());
+        amountField.setPrefWidth(200);
+
+        topUpBtn = new Button("Top Up");
+        topUpBtn.setPrefWidth(140);
+        topUpBtn.setStyle(primaryButtonStyle());
+
+        backBtn = new Button("Back");
+        backBtn.setPrefWidth(100);
+        backBtn.setStyle(ghostButtonStyle());
+
+        scene = new Scene(borderPane, 680, 420);
+    }
+
+    private void setLayout() {
+        Label heading = new Label("Top Up Balance");
+        heading.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0F172A;");
+
+        Label amountLabel = new Label("Amount");
+        amountLabel.setStyle(labelStyle());
+
+        formPane.add(amountLabel, 0, 0);
+        formPane.add(amountField, 1, 0);
+
+        HBox actions = new HBox(10);
+        actions.setAlignment(Pos.CENTER);
+        actions.getChildren().addAll(backBtn, topUpBtn);
+
+        card.getChildren().setAll(heading, balanceLabel, formPane, actions);
+        borderPane.setCenter(card);
+        BorderPane.setAlignment(card, Pos.CENTER);
+    }
+
+    private void setEventHandler(Stage stage) {
+        topUpBtn.setOnAction(e -> {
+            try {
+                String amountText = amountField.getText().trim();
+                if (amountText.isEmpty()) {
+                    showAlert(Alert.AlertType.ERROR, "Validation Error", "Please enter an amount!");
+                    return;
+                }
+
+                double amount = Double.parseDouble(amountText);
+                if (amount <= 0) {
+                    showAlert(Alert.AlertType.WARNING, "Invalid Amount", "Amount must be greater than 0!");
+                    return;
+                }
+
+                boolean success = balanceController.topUp(currentCustomer.getId(), amount);
+
+                if (success) {
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Top Up Successful!");
+                    balanceLabel.setText("Current Balance: Rp " + String.format("%,.0f", balanceController.getBalance(currentCustomer.getId())));
+                    amountField.clear();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Failed", "Top Up Failed!");
+                }
+            } catch (NumberFormatException ex) {
+                showAlert(Alert.AlertType.ERROR, "Invalid Input", "Please enter a valid number!");
+            }
+        });
+
+        backBtn.setOnAction(e -> {
+            SessionPage sessionPage = new SessionPage();
+            sessionPage.show(stage);
+        });
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private String primaryButtonStyle() {
+        return "-fx-background-color: " + ACCENT_COLOR + "; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;";
+    }
+
+    private String ghostButtonStyle() {
+        return "-fx-background-color: transparent; -fx-border-color: " + ACCENT_COLOR + "; -fx-text-fill: " + ACCENT_COLOR + "; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 10; -fx-background-radius: 10;";
+    }
+
+    private String inputStyle() {
+        return "-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #CBD5E1; -fx-padding: 10;";
+    }
+
+    private String labelStyle() {
+        return "-fx-text-fill: #475569;";
+    }
+
+    // Keep the old start method for backward compatibility but redirect to show
+    public void start(Stage stage) {
+        show(stage);
+    }
 }
