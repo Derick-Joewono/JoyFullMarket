@@ -58,4 +58,21 @@ public class ProductRepository {
         } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
+    
+    public boolean updateStock(int productId, int newStock) {
+        String query = "UPDATE product SET stock = ? WHERE productId = ?";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, newStock);
+            ps.setInt(2, productId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
