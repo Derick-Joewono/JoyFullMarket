@@ -78,7 +78,7 @@ public class CourierLoginPage {
 
         courierController = new CourierController();
 
-        scene = new Scene(borderPane, 680, 520);
+        scene = new Scene(borderPane, 1000, 700);
     }
 
     private void setLayout() {

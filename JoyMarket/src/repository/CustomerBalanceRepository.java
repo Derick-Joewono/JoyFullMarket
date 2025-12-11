@@ -9,17 +9,31 @@ import helper.DatabaseConnection;
 
 public class CustomerBalanceRepository {
 
-    private final Connection conn;
+    private Connection conn;
 
     public CustomerBalanceRepository() {
-        this.conn = DatabaseConnection.getInstance().getConnection();
+        getConnection();
+    }
+
+    private Connection getConnection() {
+        try {
+            if (conn == null || conn.isClosed()) {
+                conn = DatabaseConnection.getInstance().getConnection();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            conn = DatabaseConnection.getInstance().getConnection();
+        }
+        return conn;
     }
 
     // ---------- GET BALANCE ----------
     public double getBalance(int customerId) {
         String sql = "SELECT balance FROM customer_balance WHERE customer_id = ?";
-        
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        Connection connection = getConnection();
+        if (connection == null) return 0.0;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, customerId);
             ResultSet rs = ps.executeQuery();
             
@@ -39,14 +53,16 @@ public class CustomerBalanceRepository {
     // ---------- CREATE BALANCE IF NOT EXISTS ----------
     private void createBalanceIfNotExists(int customerId) {
         String checkSql = "SELECT COUNT(*) FROM customer_balance WHERE customer_id = ?";
-        
-        try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
+        Connection connection = getConnection();
+        if (connection == null) return;
+
+        try (PreparedStatement ps = connection.prepareStatement(checkSql)) {
             ps.setInt(1, customerId);
             ResultSet rs = ps.executeQuery();
             
             if (rs.next() && rs.getInt(1) == 0) {
                 String insertSql = "INSERT INTO customer_balance (customer_id, balance) VALUES (?, 0)";
-                try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                try (PreparedStatement insertPs = connection.prepareStatement(insertSql)) {
                     insertPs.setInt(1, customerId);
                     insertPs.executeUpdate();
                 }
@@ -59,8 +75,10 @@ public class CustomerBalanceRepository {
     // ---------- TOP UP ----------
     public boolean topUp(int customerId, double amount) {
         String sql = "UPDATE customer_balance SET balance = balance + ? WHERE customer_id = ?";
-        
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        Connection connection = getConnection();
+        if (connection == null) return false;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setDouble(1, amount);
             ps.setInt(2, customerId);
             return ps.executeUpdate() > 0;
@@ -74,8 +92,10 @@ public class CustomerBalanceRepository {
     // ---------- SET BALANCE (Optional, force set) ----------
     public boolean setBalance(int customerId, double newBalance) {
         String sql = "UPDATE customer_balance SET balance = ? WHERE customer_id = ?";
-        
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        Connection connection = getConnection();
+        if (connection == null) return false;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setDouble(1, newBalance);
             ps.setInt(2, customerId);
             return ps.executeUpdate() > 0;
