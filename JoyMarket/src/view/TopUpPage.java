@@ -85,7 +85,7 @@ public class TopUpPage {
         backBtn.setPrefWidth(100);
         backBtn.setStyle(ghostButtonStyle());
 
-        scene = new Scene(borderPane, 680, 420);
+        scene = new Scene(borderPane, 1000, 700);
     }
 
     private void setLayout() {

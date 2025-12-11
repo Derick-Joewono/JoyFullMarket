@@ -15,7 +15,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import controller.CustomerController;
 import controller.CourierController;
+import controller.AdminController;
 import helper.SessionManager;
+import view.AdminDashboardPage;
+import view.CourierDashboardPage;
 
 public class LoginPage {
 
@@ -36,6 +39,7 @@ public class LoginPage {
 
     CustomerController customerController;
     CourierController courierController;
+    AdminController adminController;
 
     private void initiate() {
         borderPane = new BorderPane();
@@ -78,8 +82,9 @@ public class LoginPage {
 
         customerController = new CustomerController();
         courierController = new CourierController();
+        adminController = new AdminController();
 
-        scene = new Scene(borderPane, 680, 580);
+        scene = new Scene(borderPane, 1000, 700);
     }
 
     private void setLayout() {
@@ -113,26 +118,47 @@ public class LoginPage {
                 return;
             }
 
-            // Attempt login
+            // Attempt login - try Customer first
             boolean customerSuccess = customerController.login(email, password);
 
             if (customerSuccess) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", 
                     "Login successful! Welcome, " + SessionManager.getInstance().getCurrentCustomerName() + "!");
                 
-                // Navigate to session page
-                SessionPage sessionPage = new SessionPage();
-                sessionPage.show(stage);
-            } else {
-                // Try courier login with same form
-                boolean courierSuccess = courierController.login(email, password);
-                if (courierSuccess) {
-                    CourierDashboardPage dashboard = new CourierDashboardPage();
-                    dashboard.show(stage);
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Login Failed", 
-                        "Invalid email or password!");
+                // Navigate to session page after alert is closed
+                try {
+                    SessionPage sessionPage = new SessionPage();
+                    sessionPage.show(stage);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "Navigation Error", 
+                        "Failed to navigate to dashboard: " + ex.getMessage());
                 }
+                return;
+            }
+            
+            // Try Admin login
+            boolean adminSuccess = adminController.login(email, password);
+            if (adminSuccess) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", 
+                    "Admin login successful! Welcome, " + SessionManager.getInstance().getCurrentAdmin().getName() + "!");
+                
+                // Navigate to admin dashboard
+                AdminDashboardPage adminDashboard = new AdminDashboardPage(SessionManager.getInstance().getCurrentAdmin());
+                adminDashboard.show(stage);
+                return;
+            }
+            
+            // Try courier login with same form
+            boolean courierSuccess = courierController.login(email, password);
+            if (courierSuccess) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", 
+                    "Courier login successful! Welcome, " + SessionManager.getInstance().getCurrentCourierName() + "!");
+                CourierDashboardPage dashboard = new CourierDashboardPage();
+                dashboard.show(stage);
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Login Failed", 
+                    "Invalid email or password!");
             }
         });
 

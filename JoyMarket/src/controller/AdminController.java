@@ -40,15 +40,17 @@ public class AdminController {
         SessionManager.getInstance().logout();
     }
 
+    public Admin getCurrentAdmin() {
+        return SessionManager.getInstance().getCurrentAdmin();
+    }
+
     
     public boolean updateProduct(Product p) {
-		
-    	try {
-			return productRepo.updateStock(p.getId(), p.getStock());
-		} catch (Exception e) {
-			return false;
-		}
-   
+        try {
+            return productRepo.updateProduct(p.getId(), p.getStock(), p.getPrice());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean assignCourier(int orderId, int courierId) {
@@ -68,6 +70,48 @@ public class AdminController {
 
 	public List<Order> listOpenOrders() {
 		return orderRepo.getAllOrders();
-		
+	}
+
+	public boolean addProduct(String name, double price, int stock) {
+		try {
+			System.out.println("Adding product: " + name + ", price: " + price + ", stock: " + stock);
+			boolean result = productRepo.insertProduct(name, price, stock);
+			System.out.println("Add product result: " + result);
+			return result;
+		} catch (Exception e) {
+			System.err.println("Error in addProduct: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean increaseStock(int productId) {
+		Product product = productRepo.getProductById(productId);
+		if (product == null) return false;
+		return productRepo.updateStock(productId, product.getStock() + 1);
+	}
+
+	public boolean decreaseStock(int productId) {
+		Product product = productRepo.getProductById(productId);
+		if (product == null) return false;
+		int newStock = product.getStock() - 1;
+		if (newStock < 0) newStock = 0;
+		return productRepo.updateStock(productId, newStock);
+	}
+
+	public boolean adjustStock(int productId, int amount) {
+		Product product = productRepo.getProductById(productId);
+		if (product == null) return false;
+		int newStock = product.getStock() + amount;
+		if (newStock < 0) newStock = 0;
+		return productRepo.updateStock(productId, newStock);
+	}
+
+	public boolean updatePrice(int productId, double newPrice) {
+		try {
+			return productRepo.updatePrice(productId, newPrice);
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }

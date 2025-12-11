@@ -9,16 +9,30 @@ import model.Customer;
 
 public class CustomerRepository {
 
-    private final Connection conn;
+    private Connection conn;
 
     public CustomerRepository() {
-        this.conn = DatabaseConnection.getInstance().getConnection();
+        getConnection();
+    }
+
+    private Connection getConnection() {
+        try {
+            if (conn == null || conn.isClosed()) {
+                conn = DatabaseConnection.getInstance().getConnection();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            conn = DatabaseConnection.getInstance().getConnection();
+        }
+        return conn;
     }
     
     public boolean insertCustomer(Customer customer) {
         String sql = "INSERT INTO customers(full_name, email, password, phone, address, gender) VALUES(?,?,?,?,?,?)";
+        Connection connection = getConnection();
+        if (connection == null) return false;
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, customer.getFull_name());
             ps.setString(2, customer.getEmail());
             ps.setString(3, customer.getPassword());
@@ -35,8 +49,10 @@ public class CustomerRepository {
     public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<>();
         String sql = "SELECT * FROM customers";
+        Connection connection = getConnection();
+        if (connection == null) return list;
 
-        try (Statement st = conn.createStatement();
+        try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -62,8 +78,10 @@ public class CustomerRepository {
    
     public Customer getCustomerById(int id) {
         String sql = "SELECT * FROM customers WHERE id = ?";
+        Connection connection = getConnection();
+        if (connection == null) return null;
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -88,8 +106,10 @@ public class CustomerRepository {
 
     public boolean updateCustomer(Customer customer) {
         String sql = "UPDATE customers SET full_name=?, email=?, password=?, phone=?, address=?, gender=? WHERE id=?";
+        Connection connection = getConnection();
+        if (connection == null) return false;
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, customer.getFull_name());
             ps.setString(2, customer.getEmail());
             ps.setString(3, customer.getPassword());
@@ -109,8 +129,10 @@ public class CustomerRepository {
 
     public boolean deleteCustomer(int id) {
         String sql = "DELETE FROM customers WHERE id=?";
+        Connection connection = getConnection();
+        if (connection == null) return false;
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
 
@@ -123,8 +145,10 @@ public class CustomerRepository {
     
     public boolean emailExists(String email) {
         String sql = "SELECT COUNT(*) FROM customers WHERE email = ?";
-        
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        Connection connection = getConnection();
+        if (connection == null) return false;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
             
@@ -140,8 +164,10 @@ public class CustomerRepository {
     
     public Customer getCustomerByEmail(String email) {
         String sql = "SELECT * FROM customers WHERE email = ?";
-        
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        Connection connection = getConnection();
+        if (connection == null) return null;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
             

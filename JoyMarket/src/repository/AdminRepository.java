@@ -7,7 +7,7 @@ import java.sql.*;
 public class AdminRepository {
 
     public Admin getAdminByEmail(String email) {
-        String query = "SELECT * FROM admin WHERE email = ?";
+        String query = "SELECT * FROM admins WHERE admin_email = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
@@ -16,10 +16,10 @@ public class AdminRepository {
 
             if (rs.next()) {
                 return new Admin(
-                    rs.getInt("adminId"),
-                    rs.getString("name"),
-                    rs.getString("email"),
-                    rs.getString("password")
+                    rs.getInt("admin_id"),
+                    rs.getString("admin_name"),
+                    rs.getString("admin_email"),
+                    rs.getString("admin_password")
                 );
             }
             return null;

@@ -29,6 +29,20 @@ public class DatabaseConnection {
 	}
 	
 	public Connection getConnection() {
+		try {
+			if (connection == null || connection.isClosed()) {
+				connection = DriverManager.getConnection(URL, USER, PASSWORD);
+				System.out.println("✅ Database Reconnected!");
+			}
+		} catch (Exception e) {
+			try {
+				connection = DriverManager.getConnection(URL, USER, PASSWORD);
+				System.out.println("✅ Database Reconnected after error!");
+			} catch (Exception ex) {
+				System.err.println("❌ Failed to reconnect database!");
+				ex.printStackTrace();
+			}
+		}
 		return connection;
 	}
 	

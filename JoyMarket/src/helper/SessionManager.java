@@ -88,7 +88,7 @@ public class SessionManager {
     }
     
     public String getCurrentAdminName() {
-        return currentCourier != null ? currentCourier.getName() : "Guest";
+        return currentAdmin != null ? currentAdmin.getName() : "Guest";
     }
     
     // General methods

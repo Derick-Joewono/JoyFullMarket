@@ -9,17 +9,31 @@ import java.util.List;
 
 public class CourierRepository {
 
-    private final Connection conn;
+    private Connection conn;
 
     public CourierRepository() {
-        this.conn = DatabaseConnection.getInstance().getConnection();
+        getConnection();
+    }
+
+    private Connection getConnection() {
+        try {
+            if (conn == null || conn.isClosed()) {
+                conn = DatabaseConnection.getInstance().getConnection();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            conn = DatabaseConnection.getInstance().getConnection();
+        }
+        return conn;
     }
 
     public List<Courier> getAllCouriers() {
         List<Courier> list = new ArrayList<>();
         String query = "SELECT * FROM couriers WHERE courier_status = 'ACTIVE'";
+        Connection connection = getConnection();
+        if (connection == null) return list;
 
-        try (Statement st = conn.createStatement();
+        try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(query)) {
 
             while (rs.next()) {
@@ -44,8 +58,10 @@ public class CourierRepository {
 
     public Courier getCourierById(int courierId) {
         String query = "SELECT * FROM couriers WHERE courier_id = ?";
+        Connection connection = getConnection();
+        if (connection == null) return null;
 
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, courierId);
             ResultSet rs = ps.executeQuery();
 
@@ -71,8 +87,10 @@ public class CourierRepository {
 
     public Courier getCourierByEmail(String email) {
         String query = "SELECT * FROM couriers WHERE courier_email = ?";
+        Connection connection = getConnection();
+        if (connection == null) return null;
 
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 
@@ -98,8 +116,10 @@ public class CourierRepository {
 
     public Courier getCourierByPhone(String phone) {
         String query = "SELECT * FROM couriers WHERE courier_phone = ?";
+        Connection connection = getConnection();
+        if (connection == null) return null;
 
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, phone);
             ResultSet rs = ps.executeQuery();
 
@@ -125,8 +145,10 @@ public class CourierRepository {
 
     public boolean insertCourier(Courier courier) {
         String sql = "INSERT INTO couriers(courier_name, courier_email, courier_phone, courier_password, courier_status, vehicle_type, vehicle_plate) VALUES(?,?,?,?,?,?,?)";
+        Connection connection = getConnection();
+        if (connection == null) return false;
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, courier.getName());
             ps.setString(2, courier.getEmail());
             ps.setString(3, courier.getPhone());
@@ -143,8 +165,10 @@ public class CourierRepository {
 
     public boolean updateCourier(Courier courier) {
         String sql = "UPDATE couriers SET courier_name=?, courier_email=?, courier_phone=?, courier_password=?, courier_status=?, vehicle_type=?, vehicle_plate=? WHERE courier_id=?";
+        Connection connection = getConnection();
+        if (connection == null) return false;
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, courier.getName());
             ps.setString(2, courier.getEmail());
             ps.setString(3, courier.getPhone());
@@ -162,7 +186,10 @@ public class CourierRepository {
 
     public boolean updateVehicleInfo(int courierId, String vehicleType, String vehiclePlate) {
         String sql = "UPDATE couriers SET vehicle_type=?, vehicle_plate=? WHERE courier_id=?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        Connection connection = getConnection();
+        if (connection == null) return false;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, vehicleType);
             ps.setString(2, vehiclePlate);
             ps.setInt(3, courierId);

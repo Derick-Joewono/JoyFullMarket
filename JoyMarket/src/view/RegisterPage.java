@@ -94,7 +94,7 @@ public class RegisterPage {
         
         customerController = new CustomerController();
 
-        scene = new Scene(borderPane, 720, 600);
+        scene = new Scene(borderPane, 1000, 700);
 
         borderPane.setCenter(card); // ✅ WAJIB ADA
     }

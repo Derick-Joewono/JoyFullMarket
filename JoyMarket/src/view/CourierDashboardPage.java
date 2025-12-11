@@ -149,7 +149,7 @@ public class CourierDashboardPage {
         logoutBtn = new Button("Logout");
         logoutBtn.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;");
 
-        scene = new Scene(borderPane, 800, 650);
+        scene = new Scene(borderPane, 1000, 700);
     }
 
     private void setLayout() {

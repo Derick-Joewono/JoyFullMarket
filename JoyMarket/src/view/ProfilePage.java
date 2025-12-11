@@ -99,7 +99,7 @@ public class ProfilePage {
 
         customerController = new CustomerController();
 
-        scene = new Scene(borderPane, 800, 620);
+        scene = new Scene(borderPane, 1000, 700);
     }
 
     private void setLayout() {
